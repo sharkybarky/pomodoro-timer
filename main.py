@@ -1,5 +1,5 @@
 from tkinter import *
-
+import pygame
 # ---------------------------- CONSTANTS ------------------------------- #
 PINK = "#e2979c"
 RED = "#e7305b"
@@ -10,6 +10,7 @@ WORK_MIN = 25
 SHORT_BREAK_MIN = 5
 LONG_BREAK_MIN = 20
 COUNTDOWN_PERIOD_MS = 1 * 1000
+# COUNTDOWN_PERIOD_MS = 1
 
 
 # ---------------------------- COUNTDOWN MECHANISM ------------------------------- #
@@ -90,6 +91,8 @@ class TimerUI:
         self.num_ticks = 1
         self.display_ticks()
 
+        self.prev_state = None
+
         self.countdown_fcn = countdown_fcn
 
     def start(self):
@@ -105,17 +108,30 @@ class TimerUI:
         self.tick_display_wgt.config(text=tick_str)
         self.tick_display_wgt.grid(row=3, column=1)
 
+    def play_music(self, mp3):
+        pygame.mixer.init()
+        pygame.mixer.music.load(mp3)
+        pygame.mixer.music.play(loops=0)
+
     def perpetual_timer(self, time_txt="00:00", state=0):
         self.app_window.after(COUNTDOWN_PERIOD_MS, self.countdown_fcn, self.perpetual_timer)
         self.canvas.itemconfig(self.countdown_wgt, text=time_txt)
         self.num_ticks = state + 1
         self.display_ticks()
         if state in (0, 2, 4, 6):
-            self.timer_text_wgt.config(text="Work")
+            self.timer_text_wgt.config(text="Work", foreground=GREEN)
+            if self.prev_state and state != self.prev_state:
+                self.play_music("hammer-sound5-37137.mp3")
         elif state == 7:
-            self.timer_text_wgt.config(text="Long Rest")
+            self.timer_text_wgt.config(text="Long Rest", foreground=RED)
+            if self.prev_state and state != self.prev_state:
+                self.play_music("ocean-waves-112906.mp3")
         else:
-            self.timer_text_wgt.config(text="Short Rest")
+            self.timer_text_wgt.config(text="Short Rest", foreground=PINK)
+            if self.prev_state and state != self.prev_state:
+                self.play_music("break-time-44678.mp3")
+
+        self.prev_state = state
 
     def run(self):
         self.perpetual_timer()
