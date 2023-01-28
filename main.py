@@ -97,6 +97,7 @@ class TimerUI:
 
     def start(self):
         self.start_countdown_fcn()
+        self.play_music("hammer-sound5-37137.mp3")
 
     def reset(self):
         self.reset_countdown_fcn()
@@ -104,14 +105,16 @@ class TimerUI:
         self.display_ticks()
 
     def display_ticks(self):
-        tick_str = "".join(["✔" for _ in range(self.num_ticks)])
+        tick_str = ""
+        for _ in range(self.num_ticks):
+            tick_str += "✔"
         self.tick_display_wgt.config(text=tick_str)
         self.tick_display_wgt.grid(row=3, column=1)
 
     def play_music(self, mp3):
         pygame.mixer.init()
         pygame.mixer.music.load(mp3)
-        pygame.mixer.music.play(loops=0)
+        pygame.mixer.music.play(loops=0, fade_ms=1000)
 
     def perpetual_timer(self, time_txt="00:00", state=0):
         self.app_window.after(COUNTDOWN_PERIOD_MS, self.countdown_fcn, self.perpetual_timer)
